@@ -15,8 +15,8 @@ SENDER_EMAIL = "vadhera.abhinav@gmail.com"
 SENDER_NAME = "Shrine Event Bot"
 
 # The email address to send the report to
-RECEIVER_EMAIL = "abhin2149@gmail.com"
-RECEIVER_NAME = "Abhinav"
+RECEIVER_EMAIL = "psahagun@usc.edu"
+RECEIVER_NAME = "Pablo Sahagun"
 
 # --- 2. SCRIPT LOGIC (Fetching and Parsing) ---
 
@@ -128,6 +128,7 @@ if __name__ == "__main__":
     
     if raw_events:
         email_body = format_events_as_html(raw_events)
-        #send_email_with_brevo(email_body)
+        send_email_with_brevo(email_body)
     else:
+
         print("No events found or error occurred, no email sent.")
