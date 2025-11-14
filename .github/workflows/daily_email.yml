@@ -40,4 +40,4 @@ jobs:
         env:
           # This securely passes your secret key to the script
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python email_shrine_events_brevo.py
+        run: python shrine_events.py
