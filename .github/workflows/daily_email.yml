@@ -35,9 +35,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests python-dateutil sib-api-v3-sdk
 
-      # 4. Run your Python script
-      - name: Run Python Script
+      # 4. Run your Python scripts
+      - name: Fetch Shrine Events
         env:
           # This securely passes your secret key to the script
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
         run: python shrine_events.py
+      - name: Fetch LA Coliseum Events
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: python la_coliseum_events.py
+          
