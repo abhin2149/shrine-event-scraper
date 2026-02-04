@@ -7,7 +7,7 @@ on:
     # This is a CRON job.
     # '0 18 * * *' means 18:00 UTC, which is 10:00 AM PST.
     # Adjust '18' if you are in a different time zone.
-    - cron: '0 18 * * *'
+    - cron: '0 18 * * 1,3,5'
 
   # This line also lets you run it manually from the "Actions" tab
   workflow_dispatch:
