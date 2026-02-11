@@ -41,4 +41,9 @@ jobs:
         env:
           # This securely passes your secret key to the script
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python mbb_events.py          
+        run: python mbb_events.py
+      - name: Fetch USC Womens Basketball Games
+        env:
+          # This securely passes your secret key to the script
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: python wbb_events.py
