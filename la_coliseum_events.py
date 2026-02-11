@@ -112,17 +112,26 @@ def extract_coliseum_events(main_url):
     return event_details, None
 
 # --- 3. FORMATTING AND EMAIL LOGIC (New) ---
+from datetime import datetime
+import pytz
+import uuid
 
 def format_events_as_html(event_list):
-    """Takes the list of scraped events and formats them into a clean HTML table."""
-    
+    """Takes the list of scraped events and formats them into a clean HTML table with entropy metadata."""
+
+    # --- ENTROPY BLOCK ---
+    pacific = pytz.timezone("US/Pacific")
+    generated_at = datetime.now(pacific).strftime("%a %b %d · %I:%M %p %Z")
+    event_count = len(event_list) if event_list else 0
+
     if not event_list:
-        return "<h1>Coliseum Event Report</h1><p>No upcoming events were found.</p>"
+        return f"<h1>Coliseum Event Report</h1><p>No upcoming events found.</p><p>Generated at: {generated_at}</p>"
 
     html_body = "<html><body>"
+    html_body += f"<p><b>Generated at:</b> {generated_at}<br><b>Source:</b> LA Coliseum<br><b>Events detected:</b> {event_count}</p><hr>"
     html_body += "<h1>🏟️ LA Coliseum Upcoming Events Report</h1>"
-    html_body += f"<p>Found {len(event_list)} upcoming events</p>"
-    
+    html_body += f"<p>Found {event_count} upcoming events</p>"
+
     # Start the HTML table
     html_body += """
     <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
@@ -136,7 +145,7 @@ def format_events_as_html(event_list):
         </thead>
         <tbody>
     """
-    
+
     for event in event_list:
         # Highlight 'TBD' or missing data in orange
         time_style = "color: #ff8c00; font-weight: bold;" if "TBD" in event['Start Time'].upper() or event['Start Time'] == "N/A" else ""
@@ -149,7 +158,7 @@ def format_events_as_html(event_list):
                 <td><a href="{event['URL']}" target="_blank">View Event Page</a></td>
             </tr>
         """
-        
+
     html_body += "</tbody></table></body></html>"
     return html_body
 
@@ -209,9 +218,9 @@ if __name__ == "__main__":
     elif scraped_events is not None:
         # 2. Format the successful data
         email_body = format_events_as_html(scraped_events)
-        
+        print(email_body)
         # 3. Send the email
-        send_email_with_brevo(email_body, email_subject)
+        # send_email_withclear_brevo(email_body, email_subject)
         
     else:
         print("Fatal error occurred. Check logs for details. No email sent.")
