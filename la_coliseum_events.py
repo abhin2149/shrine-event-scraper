@@ -10,7 +10,7 @@ from sib_api_v3_sdk.rest import ApiException
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 # Replace with your VERIFIED Brevo sender email
 SENDER_EMAIL = "vadhera.abhinav@gmail.com" # <-- **UPDATE THIS**
-SENDER_NAME = "Coliseum Event Bot"
+SENDER_NAME = "LA Coliseum Event Bot"
 
 # The email address to send the report to
 RECEIVER_EMAIL = "psahagun@usc.edu" # <-- **CONFIRM THIS**
