@@ -193,8 +193,8 @@ if __name__ == "__main__":
         )
     else:
         email_body = format_basketball_games_as_html(games)
-        print(email_body)
         send_email_with_brevo(
             email_body,
             "🏀 USC Women’s Basketball Schedule & Results"
         )
+
