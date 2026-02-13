@@ -52,4 +52,9 @@ jobs:
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
         run: python bmo_events.py
+        
+      - name: Fetch Expo Events
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: python expo_events.py
           
