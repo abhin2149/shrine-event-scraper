@@ -219,7 +219,7 @@ if __name__ == "__main__":
         # 2. Format the successful data
         email_body = format_events_as_html(scraped_events)
         # 3. Send the email
-        send_email_withclear_brevo(email_body, email_subject)
+        send_email_with_brevo(email_body, email_subject)
         
     else:
         print("Fatal error occurred. Check logs for details. No email sent.")
