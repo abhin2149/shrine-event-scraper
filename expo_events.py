@@ -2,6 +2,7 @@ import requests
 import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
+import calendar
 from datetime import datetime
 import pytz
 import uuid
@@ -93,6 +94,9 @@ def fetch_expo_events_via_api(start_date, end_date):
             continue
 
         title = evt.get("title", "").strip()
+
+        if "private" in title.lower():
+            continue
         url = evt.get("url", "").strip()
 
         # Handle single or multiple venues
@@ -207,11 +211,33 @@ def send_email_with_brevo(html_content, subject):
 # --- 5. RUN SCRIPT ---
 
 if __name__ == "__main__":
-    # Fetch events for February 2026
-    events, error = fetch_expo_events_via_api("2026-02-01", "2026-02-28")
+    pacific = pytz.timezone("US/Pacific")
+    now = datetime.now(pacific)
+
+    # First day of current month
+    start_date_dt = now.replace(day=1)
+
+    # Last day of current month
+    last_day = calendar.monthrange(now.year, now.month)[1]
+    end_date_dt = now.replace(day=last_day)
+
+    # Format as YYYY-MM-DD for API
+    start_date = start_date_dt.strftime("%Y-%m-%d")
+    end_date = end_date_dt.strftime("%Y-%m-%d")
+
+    # Human-readable month/year for subject line
+    month_year = now.strftime("%B %Y")
+
+    print(f"Fetching events from {start_date} to {end_date}")
+
+    events, error = fetch_expo_events_via_api(start_date, end_date)
+
     if error:
         print(error)
     else:
         html_report = format_api_events_as_html(events)
-        # print(html_report)
-        send_email_with_brevo(html_report, "Exposition Park February 2026 Events")
+        print(html_report)
+        send_email_with_brevo(
+            html_report,
+            f"Exposition Park {month_year} Events"
+        )
