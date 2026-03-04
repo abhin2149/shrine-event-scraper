@@ -1,5 +1,5 @@
 # This is the name of the GitHub Action
-name: Send Daily Event Email
+name: Send Monthly Event Email
 
 # This controls when the action runs
 on:
@@ -37,22 +37,6 @@ jobs:
           python -m pip install pytz
 
       # 4. Run your Python scripts
-      - name: Fetch Shrine Events
-        env:
-          # This securely passes your secret key to the script
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python shrine_events.py
-        
-      - name: Fetch LA Coliseum Events
-        env:
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python la_coliseum_events.py
-
-      - name: Fetch BMO Events
-        env:
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python bmo_events.py
-        
       - name: Fetch Expo Events
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
