@@ -11,8 +11,8 @@ from sib_api_v3_sdk.rest import ApiException
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 
-SENDER_EMAIL = "vadhera.abhinav@gmail.com"
-SENDER_NAME = "USC Basketball Bot"
+SENDER_EMAIL = "info@abhinavvadhera.me"
+SENDER_NAME = "Women's USC Basketball Bot"
 
 RECEIVER_EMAIL = "psahagun@usc.edu"
 RECEIVER_NAME = "Pablo Sahagun"
@@ -193,8 +193,8 @@ if __name__ == "__main__":
         )
     else:
         email_body = format_basketball_games_as_html(games)
-        send_email_with_brevo(
-            email_body,
-            "🏀 USC Women’s Basketball Schedule & Results"
-        )
-
+        print(email_body)
+        # send_email_with_brevo(
+        #     email_body,
+        #     "🏀 USC Women’s Basketball Schedule & Results"
+        # )
