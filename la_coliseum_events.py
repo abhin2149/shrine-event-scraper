@@ -9,7 +9,7 @@ from sib_api_v3_sdk.rest import ApiException
 # The API key will be read from the environment (e.g., GitHub Secrets)
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 # Replace with your VERIFIED Brevo sender email
-SENDER_EMAIL = "vadhera.abhinav@gmail.com" # <-- **UPDATE THIS**
+SENDER_EMAIL = "info@abhinavvadhera.me" # <-- **UPDATE THIS**
 SENDER_NAME = "LA Coliseum Event Bot"
 
 # The email address to send the report to
@@ -218,8 +218,9 @@ if __name__ == "__main__":
     elif scraped_events is not None:
         # 2. Format the successful data
         email_body = format_events_as_html(scraped_events)
+        print(email_body)
         # 3. Send the email
-        send_email_with_brevo(email_body, email_subject)
+        # send_email_withclear_brevo(email_body, email_subject)
         
     else:
         print("Fatal error occurred. Check logs for details. No email sent.")
