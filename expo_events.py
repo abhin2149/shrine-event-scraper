@@ -10,7 +10,7 @@ import platform
 # --- 1. USER CONFIGURATION ---
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
-SENDER_EMAIL = "vadhera.abhinav@gmail.com"
+SENDER_EMAIL = "info@abhinavvadhera.me"
 SENDER_NAME = "Exposition Park Event Bot"
 
 RECEIVER_EMAIL = "psahagun@usc.edu"
