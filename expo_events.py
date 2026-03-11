@@ -236,7 +236,6 @@ if __name__ == "__main__":
         print(error)
     else:
         html_report = format_api_events_as_html(events)
-        print(html_report)
         send_email_with_brevo(
             html_report,
             f"Exposition Park {month_year} Events"
