@@ -12,7 +12,7 @@ import uuid  # For unique run ID
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 
-SENDER_EMAIL = "vadhera.abhinav@gmail.com"
+SENDER_EMAIL = "info@abhinavvadhera.me"
 SENDER_NAME = "Shrine Event Bot"
 
 RECEIVER_EMAIL = "psahagun@usc.edu"
@@ -61,7 +61,7 @@ def format_events_as_html(event_list):
         try:
             event_name = event['title']['headlinersText']
             date_str = event['eventDateTime']
-            is_active = event['ticketing']['statusId'] == 1
+            is_active = event['ticketing']['statusId'] != 0
 
             dt = parser.parse(date_str)
             formatted_date = dt.strftime("%A, %B %d, %Y")
