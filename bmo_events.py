@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
     if error:
         error_html = f"<h1>🚨 BMO Scraping Error</h1><p>{error}</p>"
-        # send_email_with_brevo(error_html, "ACTION REQUIRED: BMO Scraper Error")
+        send_email_with_brevo(error_html, "ACTION REQUIRED: BMO Scraper Error")
     else:
         html_report = format_events_as_html(events)
         send_email_with_brevo(html_report, "BMO Stadium Event Report")
