@@ -7,7 +7,7 @@ from sib_api_v3_sdk.rest import ApiException
 # --- 1. USER CONFIGURATION for Brevo Email ---
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
-SENDER_EMAIL = "vadhera.abhinav@gmail.com"  # UPDATE IF NEEDED
+SENDER_EMAIL = "info@abhinavvadhera.me"  # UPDATE IF NEEDED
 SENDER_NAME = "BMO Stadium Event Bot"
 
 RECEIVER_EMAIL = "psahagun@usc.edu"  # CONFIRM
@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
     if error:
         error_html = f"<h1>🚨 BMO Scraping Error</h1><p>{error}</p>"
-        send_email_with_brevo(error_html, "ACTION REQUIRED: BMO Scraper Error")
+        # send_email_with_brevo(error_html, "ACTION REQUIRED: BMO Scraper Error")
     else:
         html_report = format_events_as_html(events)
         send_email_with_brevo(html_report, "BMO Stadium Event Report")
