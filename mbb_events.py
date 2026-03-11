@@ -1,7 +1,7 @@
 import requests
-import json
-from bs4 import BeautifulSoup
 import os
+from bs4 import BeautifulSoup
+from datetime import datetime
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
@@ -11,37 +11,29 @@ from sib_api_v3_sdk.rest import ApiException
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 
-SENDER_EMAIL = "vadhera.abhinav@gmail.com"
-SENDER_NAME = "USC Basketball Bot"
+SENDER_EMAIL = "info@abhinavvadhera.me"
+SENDER_NAME = "Men's USC Basketball Bot"
 
 RECEIVER_EMAIL = "psahagun@usc.edu"
 RECEIVER_NAME = "Pablo Sahagun"
 
-MAIN_URL = "https://usctrojans.com/sports/mens-basketball/schedule"
+MAIN_URL = "https://usctrojans.com/sports/mens-basketball/schedule/text"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; USC-Basketball-Scraper/1.0)"
 }
 
 # -------------------------------------------------
-# 2. CORE SCRAPING LOGIC
+# 2. CORE SCRAPING LOGIC (TEXT TABLE)
 # -------------------------------------------------
-
-from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
 
 def extract_usc_basketball_games(url):
     """
-    Scrapes USC Men's Basketball schedule using HTML parsing.
-    Automatically determines the academic year and adds the correct year to each date.
-    Works for all past and future games.
+    Scrapes USC Men's Basketball schedule from the TEXT view table.
+    Adds academic year dynamically.
     """
-    print(f"--- Fetching USC Basketball Schedule from: {url} ---")
 
-    HEADERS = {
-        "User-Agent": "Mozilla/5.0 (compatible; USC-Basketball-Scraper/1.0)"
-    }
+    print(f"--- Fetching USC Men's Basketball Schedule from: {url} ---")
 
     try:
         response = requests.get(url, headers=HEADERS)
@@ -50,98 +42,60 @@ def extract_usc_basketball_games(url):
         return None, f"Error fetching schedule page: {e}"
 
     soup = BeautifulSoup(response.text, "html.parser")
+
+    table = soup.find("table")
+    if not table:
+        return [], "Schedule table not found. Page structure may have changed."
+
+    tbody = table.find("tbody")
+    if not tbody:
+        return [], "Schedule table body not found."
+
+    rows = tbody.find_all("tr")
     games = []
 
-    # Determine academic year dynamically
+    # Determine academic year
     today = datetime.today()
-    if today.month >= 8:  # Aug–Dec
+    if today.month >= 8:
         season_start_year = today.year
-    else:  # Jan–Jul
+    else:
         season_start_year = today.year - 1
 
-    game_cards = soup.select('[data-test-id="s-game-card-standard__root"]')
-    if not game_cards:
-        return [], "No game cards found. Selector may have changed."
+    for row in rows:
+        cols = [c.get_text(strip=True) for c in row.find_all("td")]
 
-    for card in game_cards:
-        # -----------------------------
-        # Opponent and vs/at
-        # -----------------------------
-        opponent_tag = card.select_one(
-            '[data-test-id="s-game-card-standard__header-team-opponent-link"]'
-        )
-        opponent = opponent_tag.get_text(strip=True) if opponent_tag else "Unknown"
+        # Expected columns:
+        # Date | Time | At | Opponent | Location | Tournament | Result
+        if len(cols) < 7:
+            continue
 
-        at_vs_tag = card.select_one('[data-test-id="s-stamp__root"] span')
-        at_vs = at_vs_tag.get_text(strip=True) if at_vs_tag else "vs"
+        date_raw = cols[0]
+        time = cols[1]
+        at_flag = cols[2]
+        opponent = cols[3]
+        location = cols[4]
+        result = cols[6]
 
+        at_vs = "at" if at_flag.lower() == "at" else "vs"
         title = f"USC {at_vs} {opponent}"
 
-        # -----------------------------
-        # Location
-        # -----------------------------
-        venue_tag = card.select_one(
-            '[data-test-id="s-game-card-facility-and-location__standard-facility-title"], \
-             [data-test-id="s-game-card-facility-and-location__game-facility-title-link"]'
-        )
-        city_tag = card.select_one(
-            '[data-test-id="s-game-card-facility-and-location__standard-location-details"]'
-        )
-        venue = venue_tag.get_text(strip=True) if venue_tag else ""
-        city_state = city_tag.get_text(strip=True) if city_tag else ""
-
-        # -----------------------------
-        # Date (handle both past and future formats)
-        # -----------------------------
-        date_str = ""
-        # 1. Past / early-season format
-        date_container = card.select_one('[data-test-id="s-game-card-standard__header-game-date-details"]')
-        if date_container:
-            spans = date_container.find_all("span")
-            if spans:
-                date_str = " ".join(span.get_text(strip=True) for span in spans)
-            else:
-                date_str = date_container.get_text(strip=True)
-
-        # 2. Future / later-season format
-        if not date_str:
-            date_tag = card.select_one('[data-test-id="s-game-card-standard__header-game-date"]')
-            if date_tag:
-                main_text = date_tag.contents[0].strip() if date_tag.contents else ""
-                span_text = date_tag.find("span").get_text(strip=True) if date_tag.find("span") else ""
-                date_str = f"{main_text} {span_text}".strip()
-
-        # 3. Add year dynamically
-        if date_str and date_str != "TBD":
+        # Add academic year to date
+        date_str = "TBD"
+        if date_raw and date_raw != "TBD":
             try:
-                month_abbr = date_str.split()[0]  # e.g., "Mar"
+                month_abbr = date_raw.split()[0]
                 month_num = datetime.strptime(month_abbr, "%b").month
                 year = season_start_year if month_num >= 8 else season_start_year + 1
-                date_str = f"{date_str} {year}"
+                date_str = f"{date_raw} {year}"
             except Exception:
-                # fallback if month parsing fails
-                pass
-        else:
-            date_str = "TBD"
+                date_str = date_raw
 
-        # -----------------------------
-        # Time
-        # -----------------------------
-        time_tag = card.select_one('[aria-label="Event Time"]')
-        time = time_tag.get_text(strip=True) if time_tag else ""
-
-        # -----------------------------
-        # Result
-        # -----------------------------
-        result_tag = card.select_one('[data-test-id="s-game-card-standard__header-game-team-score"]')
-        result = result_tag.get_text(strip=True) if result_tag else ""
-
-        # -----------------------------
-        # Add to JSON
-        # -----------------------------
         games.append({
             "title": title,
-            "location": {"venue": venue, "city_state": city_state},
+            "location": {
+                "venue": location,
+                "city_state": ""
+            },
             "date": date_str,
             "time": time,
             "result": result
@@ -149,16 +103,12 @@ def extract_usc_basketball_games(url):
 
     return games, None
 
-
 # -------------------------------------------------
-# 3. EMAIL BODY BUILDER (FROM JSON STRUCTURE)
+# 3. EMAIL BODY BUILDER
 # -------------------------------------------------
 
 def format_basketball_games_as_html(games):
-    """
-    Builds the HTML email body directly from the basketball JSON structure.
-    Adds year and visually distinguishes past vs upcoming games.
-    """
+
     if not games:
         return "<h1>🏀 USC Men’s Basketball</h1><p>No games found.</p>"
 
@@ -189,25 +139,19 @@ def format_basketball_games_as_html(games):
             result_style = "font-weight:bold; color:#b42318;"
         else:
             result_style = "color:#666;"
-        game_style = ""
 
         html += f"""
-        <tr style="{game_style}">
+        <tr>
             <td><b>{game["title"]}</b></td>
             <td>{game["date"]}</td>
             <td>{game["time"]}</td>
-            <td>
-                {game["location"]["venue"]}<br/>
-                <span style="color:#666;">{game["location"]["city_state"]}</span>
-            </td>
+            <td>{game["location"]["venue"]}</td>
             <td style="{result_style}">{result}</td>
         </tr>
         """
 
     html += "</tbody></table></body></html>"
     return html
-
-
 
 # -------------------------------------------------
 # 4. EMAIL SENDING (Brevo)
@@ -231,10 +175,9 @@ def send_email_with_brevo(html_content, subject):
 
     try:
         api_instance.send_transac_email(send_smtp_email)
-        print("✅ USC Basketball email sent successfully.")
+        print("✅ USC Men’s Basketball email sent successfully.")
     except ApiException as e:
         print(f"❌ Failed to send email via Brevo: {e}")
-
 
 # -------------------------------------------------
 # 5. RUN SCRIPT
@@ -246,16 +189,17 @@ if __name__ == "__main__":
 
     if error:
         error_html = f"""
-        <h1>🚨 USC Basketball Scraper Error</h1>
+        <h1>🚨 USC Men’s Basketball Scraper Error</h1>
         <p>{error}</p>
         """
         send_email_with_brevo(
             error_html,
-            "ACTION REQUIRED: USC Basketball Scraper Error"
+            "ACTION REQUIRED: USC Men’s Basketball Scraper Error"
         )
     else:
         email_body = format_basketball_games_as_html(games)
-        send_email_with_brevo(
-            email_body,
-            "🏀 USC Men’s Basketball Schedule & Results"
-        )
+        print(email_body)
+        # send_email_with_brevo(
+        #     email_body,
+        #     "🏀 USC Men’s Basketball Schedule & Results"
+        # )
