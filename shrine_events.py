@@ -38,24 +38,41 @@ def fetch_events():
         print("ERROR: The key 'events' was not found in the JSON.")
     return None
 
+
 def format_events_as_html(event_list):
-    """Formats events into HTML for the email."""
-    print("Formatting events into HTML...")
+    """Formats events into HTML table (aligned with USC volleyball email style)."""
+
+    if not event_list:
+        return "<h1>🎭 Shrine Auditorium Events</h1><p>No events found.</p>"
 
     now_utc = datetime.now(pytz.utc)
     now_pt = now_utc.astimezone(pytz.timezone("America/Los_Angeles"))
     formatted_now = now_pt.strftime("%a %b %d · %I:%M %p PT")
 
-    entropy_html = f"""
-    <p><b>Generated at:</b> {formatted_now}<br>
-       <b>Source:</b> Shrine Auditorium<br>
-       <b>Events detected:</b> {len(event_list)}</p>
-    <hr>
+    html = "<html><body>"
+    html += "<h1>🎭 Shrine Auditorium Event Report</h1>"
+
+    html += f"""
+    <p>
+        <b>Generated at:</b> {formatted_now}<br>
+        <b>Source:</b> Shrine Auditorium<br>
+        <b>Events found:</b> {len(event_list)}
+    </p>
     """
 
-    html_body = "<html><body>"
-    html_body += "<h1>Shrine Auditorium Event Update</h1>"
-    html_body += entropy_html
+    html += """
+    <table border="1" cellpadding="10" cellspacing="0"
+           style="width:100%; border-collapse:collapse; font-family:Arial,sans-serif;">
+        <thead>
+            <tr style="background-color:#f2f2f2;">
+                <th align="left">Event</th>
+                <th align="left">Date</th>
+                <th align="left">Time</th>
+                <th align="left">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
 
     for event in event_list:
         try:
@@ -67,25 +84,28 @@ def format_events_as_html(event_list):
             formatted_date = dt.strftime("%A, %B %d, %Y")
             formatted_time = dt.strftime("%I:%M %p")
 
-            event_status = "Active" if is_active else "Cancelled/Inactive"
-            status_color = "green" if is_active else "red"
+            if is_active:
+                status_text = "Active"
+                status_style = "font-weight:bold; color:#1a7f37;"
+            else:
+                status_text = "Cancelled/Inactive"
+                status_style = "font-weight:bold; color:#b42318;"
 
-            html_body += f"""
-            <div style="margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
-                <h3 style="margin-bottom: 5px;">{event_name}</h3>
-                <p style="margin: 0; font-size: 1.1em;">
-                    {formatted_date} at {formatted_time}
-                </p>
-                <p style="margin: 5px 0 0 0;">
-                    Status: <b style="color: {status_color};">{event_status}</b>
-                </p>
-            </div>
+            html += f"""
+            <tr>
+                <td><b>{event_name}</b></td>
+                <td>{formatted_date}</td>
+                <td>{formatted_time}</td>
+                <td style="{status_style}">{status_text}</td>
+            </tr>
             """
-        except KeyError as e:
-            print(f"Warning: Skipping an event due to missing key: {e}")
 
-    html_body += "</body></html>"
-    return html_body
+        except KeyError as e:
+            print(f"Warning: Skipping event due to missing key: {e}")
+
+    html += "</tbody></table></body></html>"
+    return html
+    
 
 def send_email_with_brevo(html_content):
     """Connects to Brevo and sends the email with custom headers containing micro-entropy."""
@@ -99,7 +119,7 @@ def send_email_with_brevo(html_content):
     configuration.api_key['api-key'] = BREVO_API_KEY
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     
-    subject = "Shrine Auditorium Event Report"
+    subject = "🎭 Shrine Auditorium Event Report"
     sender = {"name": SENDER_NAME, "email": SENDER_EMAIL}
     to = [{"email": RECEIVER_EMAIL, "name": RECEIVER_NAME}]
 
