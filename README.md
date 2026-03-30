@@ -45,15 +45,6 @@ Each script: - Fetches data from official APIs or schedule pages
 
 ------------------------------------------------------------------------
 
-📂 Project Structure (Example)
-
-repo/ │ ├── shrine_events.py ├── coliseum_events.py ├── bmo_events.py
-├── expo_wtc_events.py │ ├── usc_mens_basketball.py ├──
-usc_womens_basketball.py ├── usc_volleyball.py │ ├── utils/ │ ├──
-email_client.py │ ├── formatters.py │ └── helpers.py │ └── README.md
-
-------------------------------------------------------------------------
-
 🚀 How It Works
 
 1.  Fetch Data
@@ -106,7 +97,8 @@ SENDER_EMAIL = “your@email.com” RECEIVER_EMAIL = “recipient@email.com”
 
 Each script can be run independently:
 
-python shrine_events.py python usc_volleyball.py
+python shrine_events.py 
+python usc_volleyball.py
 
 ------------------------------------------------------------------------
 
@@ -154,4 +146,4 @@ python shrine_events.py python usc_volleyball.py
 
 📬 Contact
 
-Maintained by: Abhinav Vadhera
+Maintained by: Abhinav Vadhera (vadhera@usc.edu)
