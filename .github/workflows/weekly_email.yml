@@ -47,3 +47,8 @@ jobs:
           # This securely passes your secret key to the script
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
         run: python wbb_events.py
+      - name: Fetch USC Mens Volleyball Games
+        env:
+          # This securely passes your secret key to the script
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: python mvb_events.py
