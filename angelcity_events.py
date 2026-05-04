@@ -6,6 +6,7 @@ from datetime import datetime
 import pytz
 import uuid
 import re
+import os
 import json
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
