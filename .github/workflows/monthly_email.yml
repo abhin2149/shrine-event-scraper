@@ -37,10 +37,10 @@ jobs:
           python -m pip install pytz
 
       # 4. Run your Python scripts
-      - name: Fetch Expo Events
-        env:
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-        run: python expo_events.py
+      # - name: Fetch Expo Events
+      #   env:
+      #     BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      #   run: python expo_events.py
       - name: Fetch LAFC Games
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
